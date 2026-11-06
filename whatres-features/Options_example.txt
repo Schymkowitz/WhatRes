@@ -1,0 +1,32 @@
+// Example options file for the WhatRes feature commands.
+// Format: one <tag>value; entry per line, starting with <TITLE>WHATRES_optionfile;
+// and ending with <END>. Tags not listed keep their defaults.
+// Use absolute, space-free paths: the PDB list reader splits on spaces.
+<TITLE>WHATRES_optionfile;
+<pH>7.0;
+
+// Directory prepended to relative paths in the PDB list (absolute paths need nothing)
+<surface_pdb_dir>.;
+
+// Reference database for pdb_quality_check (built with structure_survey)
+<qc_reference_db>/path/to/native49_structure_reference.bin;
+<qc_outlier_lo_pctile>0;
+<qc_outlier_hi_pctile>6;
+<qc_min_ref_count>5;
+
+// Cavity detection
+<cavity_grid_spacing>1.0;
+<cavity_probe_radius>1.4;
+<cavity_min_volume>10.0;
+<cavity_lining_dist>3.5;
+
+// Surface patches
+<surface_burial_radius>10.0;
+<surface_burial_threshold>20;
+<surface_adj_cutoff>5.0;
+<surface_min_patch_size>3;
+<surface_hphob_set>ILVFWM;
+
+// Output file prefix
+<prefix>fx_;
+<END>

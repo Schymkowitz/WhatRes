@@ -1,0 +1,6 @@
+build/
+whatres-features
+whatres-features_debug
+*.o
+*.d
+.DS_Store

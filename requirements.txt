@@ -1,0 +1,4 @@
+numpy>=2.0
+pandas>=2.2
+scikit-learn==1.8.0   # the saved models were trained with this version
+joblib>=1.5

@@ -1,0 +1,34 @@
+// Options for the unified feature builder (build_feature_matrix.py)
+// Absolute paths so commands work from any scratch subdir.
+<TITLE>WHATRES_optionfile;
+<Temperature>298.;
+<pH>7.0;
+<IonStrength>0.05;
+<TfeConc>0.;
+<StabEn>0.;
+
+
+// PDB paths in the list are absolute, so this is unused but required by some cmds
+<surface_pdb_dir>.;
+
+// Reference DB for pdb_quality_check (absolute)
+<qc_reference_db>refbuild/native49_structure_reference.bin;
+<qc_outlier_lo_pctile>0;
+<qc_outlier_hi_pctile>6;
+<qc_min_ref_count>5;
+
+// Cavity detection
+<cavity_grid_spacing>1.0;
+<cavity_probe_radius>1.4;
+<cavity_min_volume>10.0;
+<cavity_lining_dist>3.5;
+
+// Surface patches
+<surface_burial_radius>10.0;
+<surface_burial_threshold>20;
+<surface_adj_cutoff>5.0;
+<surface_min_patch_size>3;
+<surface_hphob_set>ILVFWM;
+
+<prefix>fx_;
+<END>

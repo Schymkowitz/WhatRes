@@ -1,0 +1,56 @@
+cff-version: 1.2.0
+message: "If you use WhatRes, please cite the paper below."
+title: "WhatRes"
+version: 1.0.0
+license: BSD-3-Clause
+repository-code: "https://github.com/Schymkowitz/WhatRes"
+authors:
+  - family-names: "van der Kant"
+    given-names: "Rob"
+  - family-names: "Delgado Blanco"
+    given-names: "Javier"
+  - family-names: "Serrano"
+    given-names: "Luis"
+  - family-names: "Schymkowitz"
+    given-names: "Joost"
+  - family-names: "Rousseau"
+    given-names: "Frederic"
+preferred-citation:
+  type: article
+  title: "Realism and resolution: how AI-predicted protein structures differ from experimental structures"
+  authors:
+    - family-names: "van der Kant"
+      given-names: "Rob"
+    - family-names: "Delgado Blanco"
+      given-names: "Javier"
+    - family-names: "Serrano"
+      given-names: "Luis"
+    - family-names: "Schymkowitz"
+      given-names: "Joost"
+    - family-names: "Rousseau"
+      given-names: "Frederic"
+  year: 2026
+  notes: "Preprint; DOI to be added"
+references:
+  - type: article
+    title: "The FoldX web server: an online force field"
+    authors:
+      - family-names: "Schymkowitz"
+        given-names: "Joost"
+      - family-names: "Borg"
+        given-names: "Jesper"
+      - family-names: "Stricher"
+        given-names: "Francois"
+      - family-names: "Nys"
+        given-names: "Robby"
+      - family-names: "Rousseau"
+        given-names: "Frederic"
+      - family-names: "Serrano"
+        given-names: "Luis"
+    journal: "Nucleic Acids Research"
+    volume: 33
+    start: W382
+    end: W388
+    year: 2005
+    doi: "10.1093/nar/gki387"
+    notes: "Source of the per-atom volumes and occupancy limits used by the burial terms"

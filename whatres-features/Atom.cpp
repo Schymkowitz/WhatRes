@@ -1,0 +1,441 @@
+// SequenceAnalysis, Copyright Switch Lab 2020
+// Joost Schymkowitz
+
+#include "Atom.h"
+#include "vector3D.h"
+#include <iostream>     // std::cout, std::endl
+#include <iomanip>  
+#include <mutex>
+
+using namespace std;
+
+string Atom::GetAtomType(const string& handle)
+{
+    EnsureAtomTypesLoaded("SIMPLE");
+
+    auto& types = AtomTypes();
+    auto it = types.find(handle);
+
+    if(it == types.end())
+    {
+        cout << "unknown atom type " << handle << ", returning nonsense" << endl;
+        return string("nonsense");
+    }
+    return it->second;
+}
+
+void Atom::EnsureAtomTypesLoaded(const std::string& style)
+{
+    static std::once_flag flag;
+    std::call_once(flag, [&](){
+        Atom::LoadAtomTypes(style);
+    });
+}
+
+std::map<std::string, std::string>& Atom::AtomTypes()
+{
+    static std::map<std::string, std::string> types;
+    return types;
+}
+
+void Atom::PutPDBline(ostream &o, double BF, int res_index, int atom_index, char chain, string &AAtype)
+{	
+	o << showpoint;
+    o << "ATOM  " << right << setw(5);
+    o << atom_index << "  " << left << setw(4) << atom_name;
+    o << left << setw(4) << AAtype << left << setw(1) << chain  << right;
+    o << setw(4) << res_index << "    " << right << setprecision(3);
+    o << setiosflags(ios::fixed) << setw(8) << x << right << setprecision(3) << setiosflags(ios::fixed);
+    o << setw(8) << y << right << setprecision(3) << setiosflags(ios::fixed);
+    o << setw(8) << z << setw(4) << "  1.00" << setw(6) ;
+    o << setprecision(2) << setiosflags(ios::fixed) << BF;
+	o << "\n";
+}
+
+void Atom::LoadAtomTypes(const string& style)
+{
+    auto& atomtypes = Atom::AtomTypes();
+    atomtypes.clear();
+	
+	if(style == "EXTENDED") 
+	{
+	  	  atomtypes.insert(pair<string, string>("ALA.N",	"N"));
+	  	  atomtypes.insert(pair<string, string>("ALA.CA",	"CA"));
+	  	  atomtypes.insert(pair<string, string>("ALA.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ALA.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ALA.CB",	"CH3"));
+		  atomtypes.insert(pair<string, string>("ALA.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("ARG.N",	"N"));
+		  atomtypes.insert(pair<string, string>("ARG.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("ARG.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ARG.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ARG.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("ARG.CG",	"CH2"));
+		  atomtypes.insert(pair<string, string>("ARG.CD",	"CH2.N"));
+		  atomtypes.insert(pair<string, string>("ARG.NE",	"NE"));
+		  atomtypes.insert(pair<string, string>("ARG.CZ",	"CZ.ARG"));
+		  atomtypes.insert(pair<string, string>("ARG.NH1",	"NH.ARG"));
+		  atomtypes.insert(pair<string, string>("ARG.NH2",	"NH.ARG"));
+		  atomtypes.insert(pair<string, string>("ARG.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("ASN.N",	"N"));
+		  atomtypes.insert(pair<string, string>("ASN.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("ASN.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ASN.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ASN.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("ASN.CG",	"C.QN"));
+		  atomtypes.insert(pair<string, string>("ASN.OD1",	"O.QN"));
+		  atomtypes.insert(pair<string, string>("ASN.ND2",	"N.QN"));
+		  atomtypes.insert(pair<string, string>("ASN.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("ASP.N",	"N"));
+		  atomtypes.insert(pair<string, string>("ASP.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("ASP.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ASP.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ASP.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("ASP.CG",	"C.DE"));
+		  atomtypes.insert(pair<string, string>("ASP.OD1",	"O.DE"));
+		  atomtypes.insert(pair<string, string>("ASP.OD2",	"O.DE"));
+		  atomtypes.insert(pair<string, string>("ASP.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("CYS.N",	"N"));
+		  atomtypes.insert(pair<string, string>("CYS.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("CYS.C",	"C"));
+		  atomtypes.insert(pair<string, string>("CYS.O",	"O"));
+		  atomtypes.insert(pair<string, string>("CYS.CB",	"C.CYS"));
+		  atomtypes.insert(pair<string, string>("CYS.SG",	"S.CYS"));
+		  atomtypes.insert(pair<string, string>("CYS.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("GLN.N",	"N"));
+		  atomtypes.insert(pair<string, string>("GLN.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("GLN.C",	"C"));
+		  atomtypes.insert(pair<string, string>("GLN.O",	"O"));
+		  atomtypes.insert(pair<string, string>("GLN.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("GLN.CG",	"CH2"));
+		  atomtypes.insert(pair<string, string>("GLN.CD",	"C.QN"));
+		  atomtypes.insert(pair<string, string>("GLN.OE1",	"O.QN"));
+		  atomtypes.insert(pair<string, string>("GLN.NE2",	"N.QN"));
+		  atomtypes.insert(pair<string, string>("GLN.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("GLU.N",	"N"));
+		  atomtypes.insert(pair<string, string>("GLU.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("GLU.C",	"C"));
+		  atomtypes.insert(pair<string, string>("GLU.O",	"O"));
+		  atomtypes.insert(pair<string, string>("GLU.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("GLU.CG",	"CH2"));
+		  atomtypes.insert(pair<string, string>("GLU.CD",	"C.DE"));
+		  atomtypes.insert(pair<string, string>("GLU.OE1",	"O.DE"));
+		  atomtypes.insert(pair<string, string>("GLU.OE2",	"O.DE"));
+		  atomtypes.insert(pair<string, string>("GLU.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("GLY.N",	"N"));
+		  atomtypes.insert(pair<string, string>("GLY.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("GLY.C",	"C"));
+		  atomtypes.insert(pair<string, string>("GLY.O",	"O"));
+		  atomtypes.insert(pair<string, string>("GLY.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("HIS.N",	"N"));
+		  atomtypes.insert(pair<string, string>("HIS.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("HIS.C",	"C"));
+		  atomtypes.insert(pair<string, string>("HIS.O",	"O"));
+		  atomtypes.insert(pair<string, string>("HIS.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("HIS.CG",	"C.HIS"));
+		  atomtypes.insert(pair<string, string>("HIS.ND1",	"N.HIS"));
+		  atomtypes.insert(pair<string, string>("HIS.CD2",	"C.HIS"));
+		  atomtypes.insert(pair<string, string>("HIS.CE1",	"C.HIS"));
+		  atomtypes.insert(pair<string, string>("HIS.NE2",	"N.HIS"));
+		  atomtypes.insert(pair<string, string>("HIS.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("ILE.N",	"N"));
+		  atomtypes.insert(pair<string, string>("ILE.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("ILE.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ILE.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ILE.CB",	"CH1"));
+		  atomtypes.insert(pair<string, string>("ILE.CG1",	"CH2"));
+		  atomtypes.insert(pair<string, string>("ILE.CG2",	"CH3"));
+		  atomtypes.insert(pair<string, string>("ILE.CD1",	"CH3"));
+		  atomtypes.insert(pair<string, string>("ILE.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("LEU.N",	"N"));
+		  atomtypes.insert(pair<string, string>("LEU.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("LEU.C",	"C"));
+		  atomtypes.insert(pair<string, string>("LEU.O",	"O"));
+		  atomtypes.insert(pair<string, string>("LEU.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("LEU.CG",	"CH1"));
+		  atomtypes.insert(pair<string, string>("LEU.CD1",	"CH3"));
+		  atomtypes.insert(pair<string, string>("LEU.CD2",	"CH3"));
+		  atomtypes.insert(pair<string, string>("LEU.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("LYS.N",	"N"));
+		  atomtypes.insert(pair<string, string>("LYS.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("LYS.C",	"C"));
+		  atomtypes.insert(pair<string, string>("LYS.O",	"O"));
+		  atomtypes.insert(pair<string, string>("LYS.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("LYS.CG",	"CH2"));
+		  atomtypes.insert(pair<string, string>("LYS.CD",	"CH2"));
+		  atomtypes.insert(pair<string, string>("LYS.CE",	"C.LYS"));
+		  atomtypes.insert(pair<string, string>("LYS.NZ",	"N.LYS"));
+		  atomtypes.insert(pair<string, string>("LYS.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("MET.N",	"N"));
+		  atomtypes.insert(pair<string, string>("MET.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("MET.C",	"C"));
+		  atomtypes.insert(pair<string, string>("MET.O",	"O"));
+		  atomtypes.insert(pair<string, string>("MET.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("MET.CG",	"CH2.MET"));
+		  atomtypes.insert(pair<string, string>("MET.SD",	"S.MET"));
+		  atomtypes.insert(pair<string, string>("MET.CE",	"CH3.MET"));
+		  atomtypes.insert(pair<string, string>("MET.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("PHE.N",	"N"));
+		  atomtypes.insert(pair<string, string>("PHE.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("PHE.C",	"C"));
+		  atomtypes.insert(pair<string, string>("PHE.O",	"O"));
+		  atomtypes.insert(pair<string, string>("PHE.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("PHE.CG",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CD1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CD2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CE1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CE2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CZ",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("PRO.N",	"N.PRO"));
+		  atomtypes.insert(pair<string, string>("PRO.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("PRO.C",	"C"));
+		  atomtypes.insert(pair<string, string>("PRO.O",	"O"));
+		  atomtypes.insert(pair<string, string>("PRO.CB",	"CH2.PRO"));
+		  atomtypes.insert(pair<string, string>("PRO.CG",	"CH2.PRO"));
+		  atomtypes.insert(pair<string, string>("PRO.CD",	"CH2.PRO"));
+		  atomtypes.insert(pair<string, string>("PRO.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("SER.N",	"N"));
+		  atomtypes.insert(pair<string, string>("SER.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("SER.C",	"C"));
+		  atomtypes.insert(pair<string, string>("SER.O",	"O"));
+		  atomtypes.insert(pair<string, string>("SER.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("SER.OG",	"OH"));
+		  atomtypes.insert(pair<string, string>("SER.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("THR.N",	"N"));
+		  atomtypes.insert(pair<string, string>("THR.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("THR.C",	"C"));
+		  atomtypes.insert(pair<string, string>("THR.O",	"O"));
+		  atomtypes.insert(pair<string, string>("THR.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("THR.OG1",	"CH2"));
+		  atomtypes.insert(pair<string, string>("THR.CG2",	"OH"));
+		  atomtypes.insert(pair<string, string>("THR.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("TRP.N",	"N"));
+		  atomtypes.insert(pair<string, string>("TRP.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("TRP.C",	"C"));
+		  atomtypes.insert(pair<string, string>("TRP.O",	"O"));
+		  atomtypes.insert(pair<string, string>("TRP.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("TRP.CG",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CD1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CD2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.NE1",	"N.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CE2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CE3",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CZ2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CZ3",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CH2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("TYR.N",	"N"));
+		  atomtypes.insert(pair<string, string>("TYR.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("TYR.C",	"C"));
+		  atomtypes.insert(pair<string, string>("TYR.O",	"O"));
+		  atomtypes.insert(pair<string, string>("TYR.CB",	"CH2"));
+		  atomtypes.insert(pair<string, string>("TYR.CG",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CD1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CD2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CE1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CE2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CZ",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.OH",	"OH"));
+		  atomtypes.insert(pair<string, string>("TYR.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("VAL.N",	"N"));
+		  atomtypes.insert(pair<string, string>("VAL.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("VAL.C",	"C"));
+		  atomtypes.insert(pair<string, string>("VAL.O",	"O"));
+		  atomtypes.insert(pair<string, string>("VAL.CB",	"CH1"));
+		  atomtypes.insert(pair<string, string>("VAL.CG1",	"CH3"));
+		  atomtypes.insert(pair<string, string>("VAL.CG2",	"CH3"));
+		  atomtypes.insert(pair<string, string>("VAL.OXT",	"OXT"));
+	  }
+	  else if(style == "SIMPLE")
+	  {
+	  	  atomtypes.insert(pair<string, string>("ALA.N",	"N"));
+	  	  atomtypes.insert(pair<string, string>("ALA.CA",	"CA"));
+	  	  atomtypes.insert(pair<string, string>("ALA.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ALA.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ALA.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ALA.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("ARG.N",	"N"));
+		  atomtypes.insert(pair<string, string>("ARG.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("ARG.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ARG.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ARG.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ARG.CG",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ARG.CD",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ARG.NE",	"NE"));
+		  atomtypes.insert(pair<string, string>("ARG.CZ",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ARG.NH1",	"NH.ARG"));
+		  atomtypes.insert(pair<string, string>("ARG.NH2",	"NH.ARG"));
+		  atomtypes.insert(pair<string, string>("ARG.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("ASN.N",	"N"));
+		  atomtypes.insert(pair<string, string>("ASN.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("ASN.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ASN.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ASN.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ASN.CG",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ASN.OD1",	"O.QN"));
+		  atomtypes.insert(pair<string, string>("ASN.ND2",	"N.QN"));
+		  atomtypes.insert(pair<string, string>("ASN.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("ASP.N",	"N"));
+		  atomtypes.insert(pair<string, string>("ASP.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("ASP.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ASP.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ASP.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ASP.CG",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ASP.OD1",	"O.DE"));
+		  atomtypes.insert(pair<string, string>("ASP.OD2",	"O.DE"));
+		  atomtypes.insert(pair<string, string>("ASP.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("CYS.N",	"N"));
+		  atomtypes.insert(pair<string, string>("CYS.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("CYS.C",	"C"));
+		  atomtypes.insert(pair<string, string>("CYS.O",	"O"));
+		  atomtypes.insert(pair<string, string>("CYS.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("CYS.SG",	"S.CYS"));
+		  atomtypes.insert(pair<string, string>("CYS.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("GLN.N",	"N"));
+		  atomtypes.insert(pair<string, string>("GLN.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("GLN.C",	"C"));
+		  atomtypes.insert(pair<string, string>("GLN.O",	"O"));
+		  atomtypes.insert(pair<string, string>("GLN.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("GLN.CG",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("GLN.CD",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("GLN.OE1",	"O.QN"));
+		  atomtypes.insert(pair<string, string>("GLN.NE2",	"N.QN"));
+		  atomtypes.insert(pair<string, string>("GLN.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("GLU.N",	"N"));
+		  atomtypes.insert(pair<string, string>("GLU.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("GLU.C",	"C"));
+		  atomtypes.insert(pair<string, string>("GLU.O",	"O"));
+		  atomtypes.insert(pair<string, string>("GLU.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("GLU.CG",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("GLU.CD",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("GLU.OE1",	"O.DE"));
+		  atomtypes.insert(pair<string, string>("GLU.OE2",	"O.DE"));
+		  atomtypes.insert(pair<string, string>("GLU.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("GLY.N",	"N"));
+		  atomtypes.insert(pair<string, string>("GLY.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("GLY.C",	"C"));
+		  atomtypes.insert(pair<string, string>("GLY.O",	"O"));
+		  atomtypes.insert(pair<string, string>("GLY.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("HIS.N",	"N"));
+		  atomtypes.insert(pair<string, string>("HIS.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("HIS.C",	"C"));
+		  atomtypes.insert(pair<string, string>("HIS.O",	"O"));
+		  atomtypes.insert(pair<string, string>("HIS.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("HIS.CG",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("HIS.ND1",	"N.arom"));
+		  atomtypes.insert(pair<string, string>("HIS.CD2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("HIS.CE1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("HIS.NE2",	"N.arom"));
+		  atomtypes.insert(pair<string, string>("HIS.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("ILE.N",	"N"));
+		  atomtypes.insert(pair<string, string>("ILE.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("ILE.C",	"C"));
+		  atomtypes.insert(pair<string, string>("ILE.O",	"O"));
+		  atomtypes.insert(pair<string, string>("ILE.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ILE.CG1",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ILE.CG2",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ILE.CD1",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("ILE.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("LEU.N",	"N"));
+		  atomtypes.insert(pair<string, string>("LEU.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("LEU.C",	"C"));
+		  atomtypes.insert(pair<string, string>("LEU.O",	"O"));
+		  atomtypes.insert(pair<string, string>("LEU.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("LEU.CG",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("LEU.CD1",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("LEU.CD2",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("LEU.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("LYS.N",	"N"));
+		  atomtypes.insert(pair<string, string>("LYS.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("LYS.C",	"C"));
+		  atomtypes.insert(pair<string, string>("LYS.O",	"O"));
+		  atomtypes.insert(pair<string, string>("LYS.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("LYS.CG",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("LYS.CD",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("LYS.CE",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("LYS.NZ",	"N.LYS"));
+		  atomtypes.insert(pair<string, string>("LYS.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("MET.N",	"N"));
+		  atomtypes.insert(pair<string, string>("MET.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("MET.C",	"C"));
+		  atomtypes.insert(pair<string, string>("MET.O",	"O"));
+		  atomtypes.insert(pair<string, string>("MET.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("MET.CG",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("MET.SD",	"S.MET"));
+		  atomtypes.insert(pair<string, string>("MET.CE",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("MET.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("PHE.N",	"N"));
+		  atomtypes.insert(pair<string, string>("PHE.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("PHE.C",	"C"));
+		  atomtypes.insert(pair<string, string>("PHE.O",	"O"));
+		  atomtypes.insert(pair<string, string>("PHE.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("PHE.CG",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CD1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CD2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CE1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CE2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.CZ",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("PHE.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("PRO.N",	"N"));
+		  atomtypes.insert(pair<string, string>("PRO.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("PRO.C",	"C"));
+		  atomtypes.insert(pair<string, string>("PRO.O",	"O"));
+		  atomtypes.insert(pair<string, string>("PRO.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("PRO.CG",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("PRO.CD",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("PRO.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("SER.N",	"N"));
+		  atomtypes.insert(pair<string, string>("SER.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("SER.C",	"C"));
+		  atomtypes.insert(pair<string, string>("SER.O",	"O"));
+		  atomtypes.insert(pair<string, string>("SER.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("SER.OG",	"OH"));
+		  atomtypes.insert(pair<string, string>("SER.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("THR.N",	"N"));
+		  atomtypes.insert(pair<string, string>("THR.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("THR.C",	"C"));
+		  atomtypes.insert(pair<string, string>("THR.O",	"O"));
+		  atomtypes.insert(pair<string, string>("THR.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("THR.OG1",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("THR.CG2",	"OH"));
+		  atomtypes.insert(pair<string, string>("THR.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("TRP.N",	"N"));
+		  atomtypes.insert(pair<string, string>("TRP.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("TRP.C",	"C"));
+		  atomtypes.insert(pair<string, string>("TRP.O",	"O"));
+		  atomtypes.insert(pair<string, string>("TRP.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("TRP.CG",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CD1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CD2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.NE1",	"N.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CE2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CE3",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CZ2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CZ3",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.CH2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TRP.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("TYR.N",	"N"));
+		  atomtypes.insert(pair<string, string>("TYR.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("TYR.C",	"C"));
+		  atomtypes.insert(pair<string, string>("TYR.O",	"O"));
+		  atomtypes.insert(pair<string, string>("TYR.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("TYR.CG",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CD1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CD2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CE1",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CE2",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.CZ",	"C.arom"));
+		  atomtypes.insert(pair<string, string>("TYR.OH",	"OH"));
+		  atomtypes.insert(pair<string, string>("TYR.OXT",	"OXT"));
+		  atomtypes.insert(pair<string, string>("VAL.N",	"N"));
+		  atomtypes.insert(pair<string, string>("VAL.CA",	"CA"));
+		  atomtypes.insert(pair<string, string>("VAL.C",	"C"));
+		  atomtypes.insert(pair<string, string>("VAL.O",	"O"));
+		  atomtypes.insert(pair<string, string>("VAL.CB",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("VAL.CG1",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("VAL.CG2",	"C.alif"));
+		  atomtypes.insert(pair<string, string>("VAL.OXT",	"OXT"));
+	  	
+	  }
+}

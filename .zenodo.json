@@ -1,0 +1,44 @@
+{
+ "upload_type": "software",
+ "title": "WhatRes: apparent resolution and realism of protein structures from coordinates",
+ "creators": [
+  {
+   "name": "van der Kant, Rob",
+   "affiliation": "VIB Center for Neuroscience Leuven; KU Leuven, Department of Cellular and Molecular Medicine; VIB Center for AI and Computational Biology"
+  },
+  {
+   "name": "Delgado Blanco, Javier",
+   "affiliation": "Centre for Genomic Regulation (CRG), The Barcelona Institute for Science and Technology"
+  },
+  {
+   "name": "Serrano, Luis",
+   "affiliation": "Centre for Genomic Regulation (CRG), The Barcelona Institute for Science and Technology; Universitat Pompeu Fabra (UPF); ICREA"
+  },
+  {
+   "name": "Schymkowitz, Joost",
+   "affiliation": "VIB Center for Neuroscience Leuven; KU Leuven, Department of Cellular and Molecular Medicine; VIB Center for AI and Computational Biology"
+  },
+  {
+   "name": "Rousseau, Frederic",
+   "affiliation": "VIB Center for Neuroscience Leuven; KU Leuven, Department of Cellular and Molecular Medicine; VIB Center for AI and Computational Biology"
+  }
+ ],
+ "description": "WhatRes scores a protein structure from its coordinates alone on two axes: apparent resolution (Å), the resolution at which an experimental structure would typically show the same local geometry, and realism (0 to 100), how experimental-like the geometry is, independent of resolution. It consists of whatres-features, a C++ program that computes the structural descriptors, and a Python package that applies the two trained models. Software accompanying the paper “Realism and resolution: how AI-predicted protein structures differ from experimental structures”.",
+ "license": "BSD-3-Clause",
+ "keywords": [
+  "protein structure",
+  "structure validation",
+  "apparent resolution",
+  "structure prediction",
+  "AlphaFold",
+  "X-ray crystallography",
+  "cryo-EM"
+ ],
+ "related_identifiers": [
+  {
+   "identifier": "10.5281/zenodo.24014748",
+   "relation": "isSupplementedBy",
+   "resource_type": "dataset"
+  }
+ ]
+}

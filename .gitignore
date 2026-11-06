@@ -1,0 +1,5 @@
+models/apparent_resolution_model.joblib
+whatres-features/whatres-features
+whatres-features/build/
+__pycache__/
+*.part

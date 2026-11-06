@@ -1,0 +1,13 @@
+Atom-parameter library: lib/<platform>/libatomparams.a
+
+This library contains the FoldX atom parameters used for burial (per-atom
+volume and minimal and maximal occupancy, FoldX 2014 parameter set) in
+compiled form. It is not covered by the BSD licence in LICENSE.
+
+It is distributed for use with whatres-features only, under the terms of the
+FoldX licence. Do not decompile it, extract the parameter values, or
+redistribute it separately from whatres-features.
+
+FoldX: Schymkowitz J, Borg J, Stricher F, Nys R, Rousseau F, Serrano L. The
+FoldX web server: an online force field. Nucleic Acids Res. 2005;33:W382-W388.
+doi:10.1093/nar/gki387

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "whatres"
+version = "1.0.0"
+description = "Apparent resolution and realism of protein structures from coordinates"
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.11"
+dependencies = ["numpy>=2.0", "pandas>=2.2", "scikit-learn==1.8.0", "joblib>=1.5"]
+
+[project.scripts]
+whatres = "whatres.cli:main"
+
+[tool.setuptools]
+packages = ["whatres"]
